@@ -1,0 +1,160 @@
+{
+  "name": "My workflow 3",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Central de Atendimento / Feedback",
+        "formDescription": "Preencha os campos abaixo para registrar sua solicitação",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Nome"
+            },
+            {
+              "fieldLabel": "E-mail",
+              "fieldType": "email"
+            },
+            {
+              "fieldLabel": "Solicitação",
+              "fieldType": "textarea"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.6,
+      "position": [
+        -320,
+        0
+      ],
+      "id": "9d4c7d35-3f64-4e2b-a962-d755dac44cbc",
+      "name": "On form submission",
+      "webhookId": "55367059-70ac-40d7-a460-cd3228bc369b"
+    },
+    {
+      "parameters": {
+        "jsCode": "for (const item of $input.all()) {\n  // Pega o texto enviado no campo de mensagem/solicitação do formulário\n  const mensagem = (item.json.mensagem || item.json.solicitacao || \"\").toLowerCase();\n  \n  let categoria = \"Dúvida Geral\";\n  \n  // Regra simples de categorização baseada em palavras-chave\n  if (mensagem.includes(\"erro\") || mensagem.includes(\"problema\") || mensagem.includes(\"falha\") || mensagem.includes(\"ajuda\")) {\n    categoria = \"Suporte Técnico\";\n  } else if (mensagem.includes(\"comprar\") || mensagem.includes(\"preço\") || mensagem.includes(\"plano\") || mensagem.includes(\"valor\")) {\n    categoria = \"Comercial / Vendas\";\n  }\n  \n  // Adiciona a nova propriedade com a categoria tratada\n  item.json.categoria = categoria;\n  item.json.data_registro = new Date().toISOString();\n}\n\nreturn $input.all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -112,
+        0
+      ],
+      "id": "5e38f63c-9f35-44fb-a60f-f5f5fc416745",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1-l1NRjegfsTznnmmHK5patv9d5xes9VaUzMebYiHl_s/edit?gid=0#gid=0",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Página1"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Data": "={{ $json.data_registro }}",
+            "Remetente": "={{ $json[\"E-mail\"] }}",
+            "Assunto": "={{ $json[\"Solicitação\"] }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Data",
+              "displayName": "Data",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Remetente",
+              "displayName": "Remetente",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Assunto",
+              "displayName": "Assunto",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        112,
+        0
+      ],
+      "id": "295d7801-ccec-4ce5-a3d3-760eec5c4110",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "QFGANgegqg1eHJEQ",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "c51abe2c-5791-4b9a-ba3f-b4ee15042f7c",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "eaad999dd69fe8d62498d45f419eed10bb1f74fed2c4fad2bf71e8eea8f18628"
+  },
+  "nodeGroups": [],
+  "id": "HOey6YhwbvOzIjB9",
+  "tags": []
+}

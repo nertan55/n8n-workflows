@@ -1,0 +1,92 @@
+{
+  "name": "My workflow 2",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Assistente de Consulta",
+        "formDescription": "Digite sua consulta para buscar os dados na API",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Consulta"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.6,
+      "position": [
+        -272,
+        0
+      ],
+      "id": "02048fb0-5825-42c0-9671-d16e32eb71be",
+      "name": "On form submission",
+      "webhookId": "d8275c3e-eb99-42a5-b07e-ce1c0c923709"
+    },
+    {
+      "parameters": {
+        "url": "https://api.github.com/users/octocat",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        -32,
+        0
+      ],
+      "id": "5a98a47a-c7df-4124-92fe-2c1c3ae77f54",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $input.first().json;\n\n// Estruturando os insights principais em um formato JSON limpo\nconst insightsEstruturados = {\n  timestamp: new Date().toISOString(),\n  usuario: data.login || \"N/A\",\n  perfil_id: data.id || 0,\n  avatar: data.avatar_url || \"\",\n  estatisticas: {\n    public_repos: data.public_repos || 0,\n    seguidores: data.followers || 0,\n    seguindo: data.following || 0\n  },\n  status: \"sucesso\"\n};\n\nreturn [{ json: insightsEstruturados }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        176,
+        0
+      ],
+      "id": "69d1d5eb-b293-4233-b826-a75e5b3923da",
+      "name": "Code in JavaScript"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "308c07f1-e3f5-4e0e-9322-10650cc7eeab",
+  "meta": {
+    "instanceId": "eaad999dd69fe8d62498d45f419eed10bb1f74fed2c4fad2bf71e8eea8f18628"
+  },
+  "nodeGroups": [],
+  "id": "CzC2WXDzSaywG4LH",
+  "tags": []
+}

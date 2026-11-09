@@ -1,0 +1,142 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.snippet }}",
+        "options": {
+          "systemMessage": "Você é um assistente sênior de atendimento ao cliente e triagem automatizada. \n\nSua tarefa ao receber um e-mail é:\n1. Analisar o conteúdo da mensagem recebida.\n2. Classificar a intenção do cliente em uma das seguintes categorias: Dúvida, Reclamação, Orçamento ou Suporte.\n3. Definir o nível de prioridade: Baixa, Média ou Alta.\n4. Redigir uma resposta profissional, educada, empática e direta em português para ser enviada ao cliente.\n\nMantenha o tom prestativo, resolutivo e focado na satisfação do cliente."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -48,
+        -64
+      ],
+      "id": "745a13eb-17aa-4e27-9dc5-423863ced17d",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.2,
+      "position": [
+        -48,
+        160
+      ],
+      "id": "c45ab2c0-0347-4d19-8fe1-bcb00c755050",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "bipqd26DbnmDrWNS",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            },
+            {},
+            {},
+            {}
+          ]
+        },
+        "filters": {}
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -240,
+        -64
+      ],
+      "id": "038e62bf-ae94-4cdf-be3e-040722527643",
+      "name": "Gmail Trigger",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "TwmqUVLKv5r12MAU",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Gmail Trigger').item.json.From }}",
+        "subject": "Re: Resumo do seu atendimento.",
+        "message": "={{ $json.output }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        224,
+        -64
+      ],
+      "id": "3ad36eea-341c-4d18-87d1-d427cd3fe98e",
+      "name": "Send a message",
+      "webhookId": "174a2745-c1c2-4750-86cf-988de132b4dc",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "TwmqUVLKv5r12MAU",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "08c58316-2afc-4124-aec2-99d3c419d0ae",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "eaad999dd69fe8d62498d45f419eed10bb1f74fed2c4fad2bf71e8eea8f18628"
+  },
+  "nodeGroups": [],
+  "id": "1Hf4iUNjw0ZFCODS",
+  "tags": []
+}
